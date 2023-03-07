@@ -7,7 +7,7 @@ This is an attempt to replicate the well-known NCS Spectrum Audio Reactor, imple
 3. Run the module with ```glava -m ncs``` (Suggested resolution in rc.glsl: 370x370)
 
 # Shadertoy Link
-The shader was first made to work on shadertoy.com, which allows developing fragment shaders. Link to the shader here: https://www.shadertoy.com/view/XddfzM
+The shader was first made to work on shadertoy.com, which allows developing fragment shaders. Link to the shader here: https://www.shadertoy.com/view/dtfSDM
 
 # Credits
 Credits for particle-tracking go to Rory618 on Shadertoy, see the work here: https://www.shadertoy.com/view/XddfzM
