@@ -50,7 +50,7 @@ void main() {
        // coeff = 5.6;
         //fragment += 1.5 / (1. + exp(max(length(uv - .5), .3) * 11. * length(p.xy * screen.xy - gl_FragCoord.xy)));
      
-        fragment.xyzw += 100.5 / (1. + exp(coeff * length(p.xy * screen.xy - gl_FragCoord.xy)));
+        fragment.xyzw += 30.5 / (1. + exp(coeff * length(p.xy * screen.xy - gl_FragCoord.xy)));
 
     }
 
