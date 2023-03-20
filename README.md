@@ -1,8 +1,10 @@
 # NCS_Spectrum_GLava
-This is an attempt to replicate the well-known NCS Spectrum Audio Reactor, implemented for GLava. This is a fragment shader comprising of 7 buffers, and may prove to be a little GPU-intensive, but looks aesthetically pleasing anyways :) 
+This is an attempt to replicate the well-known NCS Spectrum Audio Reactor, implemented for GLava. This is a fragment shader comprising of 8 (previously 7) buffers, and may prove to be a little GPU-intensive, but looks aesthetically pleasing anyways :) 
 
 
-https://user-images.githubusercontent.com/15421185/223540924-b7bf67e8-6239-49af-8bb6-fda844f1acfa.mp4
+
+https://user-images.githubusercontent.com/15421185/226474169-3f713d86-560f-42be-b81e-9bb32018ba09.mp4
+
 
 
 # Installation Instructions
