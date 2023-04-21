@@ -10,7 +10,7 @@ uniform sampler2D prev;
 
 out vec4 fragment; /* output */
 
-int i2=12;
+int i2=35;
 
 float glow(float x,float str,float dist){
     return dist+dist/pow(x,str);
@@ -33,23 +33,19 @@ void main(){
         r.w*=6.28318;
         r.zw=r.z*vec2(cos(r.w),sin(r.w));
         vec4 p=texture(prev,(gl_FragCoord.xy)/screen.xy);//sample random nearby points
-        
-        if(length(fragment.xyz)>.01){
+        float width=1.;
+        float len=length(p.xy*screen.xy-gl_FragCoord.xy);
+        if(length(fragment.xyz)>39.2){
             fragment.w+=.05;
-            
             fragment.xyz+=1*vec3((glow(length(fragment.xyzw),5.90,8.002)));
-            // fragment.xyzw*=30.4;
-        }else fragment.w=0.;
-        //  fragment.x=((glow(length(fragment.xy), 512.90, -120.002)));
-        //float coeff = min(1. / length(uv - .5), .06) * 80.;
+            
+            //width=1;
+        }else{fragment.w=0.;width=1.;}
+        
         float coeff=min(1./abs(length(uv-.5)),.06)*50.;//120
         
-        //coeff=smoothstep(.38,.3,fragment.w*length(uv-.5))*coeff/260*80;
-        // coeff = 5.6;
-        //fragment += 1.5 / (1. + exp(max(length(uv - .5), .3) * 11. * length(p.xy * screen.xy - gl_FragCoord.xy)));
-        
-        fragment.xyzw+=.5/(1.+exp(coeff*length(p.xy*screen.xy-gl_FragCoord.xy)));
-        
+        fragment.xyzw+=3.5/(1.+exp(coeff*length(len)/width*.325));
+        // fragment.xyz=fragment.xyz/width*.5;
     }
     
     fragment.xyz/=fragment.w;
