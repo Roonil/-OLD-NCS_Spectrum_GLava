@@ -17,13 +17,7 @@ vec4 getAvgColorAround(vec2 uv){
     
     vec4 sum=vec4(0);
     vec2 texcoord=uv;
-    int j;
-    int i;
     
-    //thank you! http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/ for the
-    //blur tutorial
-    // blur in y (vertical)
-    // take nine samples, with the distance blurSize between them
     sum+=texture(prev,vec2(texcoord.x-4.*blurSize,texcoord.y))*.05;
     sum+=texture(prev,vec2(texcoord.x-3.*blurSize,texcoord.y))*.09;
     sum+=texture(prev,vec2(texcoord.x-2.*blurSize,texcoord.y))*.12;
@@ -33,12 +27,6 @@ vec4 getAvgColorAround(vec2 uv){
     sum+=texture(prev,vec2(texcoord.x+2.*blurSize,texcoord.y))*.12;
     sum+=texture(prev,vec2(texcoord.x+3.*blurSize,texcoord.y))*.09;
     sum+=texture(prev,vec2(texcoord.x+4.*blurSize,texcoord.y))*.05;
-    <<<<<<<HEAD
-    
-    // blur in y (vertical)
-    // take nine samples, with the distance blurSize between them
-    =======
-    >>>>>>>0e09aee(Added depth,fixed feathering of circle)
     sum+=texture(prev,vec2(texcoord.x,texcoord.y-4.*blurSize))*.05;
     sum+=texture(prev,vec2(texcoord.x,texcoord.y-3.*blurSize))*.09;
     sum+=texture(prev,vec2(texcoord.x,texcoord.y-2.*blurSize))*.12;
@@ -49,15 +37,9 @@ vec4 getAvgColorAround(vec2 uv){
     sum+=texture(prev,vec2(texcoord.x,texcoord.y+3.*blurSize))*.09;
     sum+=texture(prev,vec2(texcoord.x,texcoord.y+4.*blurSize))*.05;
     
-    <<<<<<<HEAD
-    //increase blur with intensity!
-    //fragColor = sum*intensity + texture(prev, texcoord);
-    
-    =======
     //  const float intensity=1.2*smoothstep(.01,.5,length(sum));
     
-    const float intensity=.4;
-    >>>>>>>0e09aee(Added depth,fixed feathering of circle)
+    const float intensity=1.5;
     col=sum*intensity+texture(prev,texcoord);
     return col;
 }
@@ -67,16 +49,6 @@ void main()
     vec2 uv=gl_FragCoord.xy/screen.xy;
     fragment=getAvgColorAround(uv);
     vec4 prevColor=texture(prev,uv);
-    <<<<<<<HEAD
-    if(length(prevColor.xyz-fragment.xyz)/length(fragment.xyz)<.26)
-    {
-        fragment*=.6;
-        fragment.w*=.6;
-    }
-    
-    if(uv.x>.99||(uv.y)>.99||uv.y<.01)fragment=vec4(0);
-    
-    =======
     
     vec4 old=fragment;
     
@@ -97,7 +69,11 @@ void main()
     
     if(length(fragment.xyz)>=0&&length(fragment.xyz)<.5)
     fragment.xyzw*=1.3;
-    >>>>>>>0e09aee(Added depth,fixed feathering of circle)
+    
+    fragment.w*=1.5;
+    
+    if(length(fragment)>1.)
+    fragment-=prevColor;
     //fragment.w=smoothstep(0,1,length(uv-.5));
     //  fragment.xyz=vec3(0);
 }

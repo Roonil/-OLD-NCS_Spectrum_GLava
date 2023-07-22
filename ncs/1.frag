@@ -43,7 +43,9 @@ float audioFractal7=max(smooth_audio(audio_r,audio_sz,.6),smooth_audio(audio_r,a
 float audioFractal8=max(smooth_audio(audio_r,audio_sz,.7),smooth_audio(audio_r,audio_sz,.75));
 //audio += 1 - (1 + sin(7. * audio)) / 2;
 
-float v=3.;//3.
+uniform float v=2.;//3.
+
+uniform float displaceX=1.95,displaceY=1.9,displaceZ=1.905,flowX=.0,flowY=.016,flowZ=0.,flowEvolution=.01;//displaceX=1.25,displaceY=1.2,displaceZ=1.225 flowY=.017, evol=.00575
 
 #define permute(x)mod(((x*34.)+1.)*x,289.)
 #define taylorInvSqrt(r)1.79284291400159-.85373472095314*r
@@ -182,20 +184,16 @@ float cnoise(vec4 P,vec4 rep){
 
 float octaveNoise(vec4 p,vec4 flow){
   float total=0.;
-  float persistence=.5;
-  float lacunarity=2.;
+  const float persistence=.5;
+  const float lacunarity=2.;
   float frequency=1.;
   float amplitude=1.;
   float value=0.;
   const int octaves=3;
   
-  <<<<<<<HEAD
-  float audios[7]={audioDisperse4,audioDisperse5,1.3*audioFractal1,1.3*audioFractal2,1.3*audioFractal3,1.3*audioDisperse1,1.3*audioDisperse2};
-  =======
   float audios[7]={audioFractal4,audioFractal5,1.3*audioFractal6,1.3*audioFractal7,1.3*audioFractal8,1.3*audioFractal1,1.3*audioFractal2};
-  >>>>>>>0e09aee(Added depth,fixed feathering of circle)
   
-  for(int i=0;i<7;i++)
+  for(int i=0;i<3;i++)
   for(int j=i;j<7;j++)
   if(audios[i]<audios[j])
   {
@@ -204,135 +202,57 @@ float octaveNoise(vec4 p,vec4 flow){
     audios[j]=temp;
   }
   
-  <<<<<<<HEAD
+  const float finalAudio=.6*max(0.,1.50802*(audios[0]-.04))*(max(1.,2.0802*(audios[1])))*(max(1.,3.4802*(audios[2])));//2.0802, 2.4802
+  
+  //  float finalAudio=max(0.,2.2802*audios[1])*max(1.,clamp(100.,.15,3.7802*audios[2])-.15);
+  
   for(int i=0;i<octaves;i+=1){
     
-    value+=.4*min((audios[0]+.8802*audios[1]+.8802*audios[2]),4.8)*cnoise(vec4((p+flow*time)*frequency),vec4(0))*amplitude;
-    =======
-    float finalAudio=.6*max(0.,1.50802*(audios[0]-.04))*(max(1.,2.0802*(audios[1])))*(max(1.,3.4802*(audios[2])));//2.0802, 2.4802
+    value+=.67*finalAudio*cnoise(vec4((p+flow*time)*frequency),vec4(0))*amplitude;
     
-    //  float finalAudio=max(0.,2.2802*audios[1])*max(1.,clamp(100.,.15,3.7802*audios[2])-.15);
+    //flowY=.015
+    // value+=.4*min((audios[0]+.8802*audios[1]+.8802*audios[2]),4.8)*cnoise(vec4((p+flow*time)*frequency),vec4(0))*amplitude;
+    total+=amplitude;
     
-    for(int i=0;i<octaves;i+=1){
-      
-      value+=.67*finalAudio*cnoise(vec4((p+flow*time)*frequency),vec4(0))*amplitude;
-      
-      //flowY=.015
-      // value+=.4*min((audios[0]+.8802*audios[1]+.8802*audios[2]),4.8)*cnoise(vec4((p+flow*time)*frequency),vec4(0))*amplitude;
-      >>>>>>>0e09aee(Added depth,fixed feathering of circle)
-      total+=amplitude;
-      
-      amplitude*=persistence;
-      frequency*=lacunarity;
-    }
-    return value/total;
+    amplitude*=persistence;
+    frequency*=lacunarity;
+  }
+  return value/total;
+}
+
+float fbm3(vec4 p,float disp,vec4 flow){
+  
+  float perlinVal=0;
+  float scale=1.,offset=0.,multiplier=1.;//scale=1.
+  perlinVal=offset+multiplier*octaveNoise(scale*p,flow);
+  return disp*perlinVal;
+}
+
+void main(){
+  vec4 r=vec4(0);
+  
+  for(int j=0;j<30;j++){
+    r.xy=floor(gl_FragCoord.xy/v)*v/screen.xy;//hash44(vec4(floor(i/v),0,j));
+    if(length(r-.5)<.5)
+    break;
   }
   
-  float fbm3(vec4 p,float disp,vec4 flow){
-    
-    float perlinVal=0,maxDisp=disp;
-    <<<<<<<HEAD
-    float scale=1.,offset=0.,multiplier=1.;
-    perlinVal=offset+multiplier*octaveNoise(vec4(scale*p.x,scale*p.y,scale*p.z,scale*p.w),flow);
-    =======
-    float scale=1.,offset=0.,multiplier=1.;//scale=1.
-    perlinVal=offset+multiplier*octaveNoise(scale*p,flow);
-    >>>>>>>0e09aee(Added depth,fixed feathering of circle)
-    return maxDisp*perlinVal;
-    //  maxDisp=.60*disp;  //4.50
-    
-  }
+  fragment.xyz=r.xyz*2.-1.;
+  fragment.w=0;
+  fragment.z=(fragment.z+1.)/2.;
   
-  void main(){
-    vec4 r=vec4(0);
-    
-    for(int j=0;j<30;j++){
-      r.xy=floor(gl_FragCoord.xy/v)*v/screen.xy;//hash44(vec4(floor(i/v),0,j));
-      if(length(r-.5)<.5)
-      break;
-    }
-    
-    fragment.xyz=r.xyz*2.-1.;
-    fragment.w=0;
-    
-    <<<<<<<HEAD
-    float timeVal=0,displaceX=min(1.6,1.85),displaceY=min(1.6,1.85),displaceZ=min(4.3,5.);
-    float flowX=0,flowY=.017,flowZ=0.,flowEvolution=.01;
-    
-    vec4 old=vec4(fragment.xyz,timeVal);
-    float val1=fbm3(old.xyzw,displaceX,vec4(flowX,flowY,flowZ,flowEvolution));
-    float val2=fbm3(old.yzxw,displaceY,vec4(flowY,flowZ,flowX,flowEvolution));
-    float val3=fbm3(old.zxyw,displaceZ,vec4(flowZ,flowX,flowY,flowEvolution));
-    fragment.xyz+=vec3(val1,0,0);
-    fragment.xyz+=vec3(0,val2,0);
-    fragment.xyz+=vec3(0,0,val3);
-    
-    //fragment.xyz += vec3(fbm3( ec4(S*vec4(fragment.xxx,evolution)),displaceX,flowX),fbm3(vec4(S*vec4(fragment.yyy,evolution)),displaceY,flowY),fbm3(vec4(S*vec4(fragment.xyz,evolution)),displaceZ,flowZ))/S;//1.25
-    =======
-    float timeVal=0,displaceX=1.95,displaceY=1.9,displaceZ=1.905;//displaceX=1.25,displaceY=1.2,displaceZ=1.225
-    float flowX=.0,flowY=.016,flowZ=0.,flowEvolution=.01;//flowY=.017, evol=.00575
-    
-    // vec4 old=vec4(fragment.xyz,timeVal);
-    // float val1=fbm3(old.xyzw,displaceX,vec4(flowX,flowY,flowZ,flowEvolution));
-    // float val2=fbm3(old.yzxw,displaceY,vec4(flowY,flowZ,flowX,flowEvolution));
-    // float val3=fbm3(old.zxyw,displaceZ,vec4(flowZ,flowX,flowY,flowEvolution));
-    // fragment.xyz+=vec3(val1,0,0);
-    // fragment.xyz+=vec3(0,val2,0);
-    // fragment.xyz+=vec3(0,0,val3);
-    >>>>>>>0e09aee(Added depth,fixed feathering of circle)
-    fragment.z=(fragment.z+1.)/2.;
-    
-    <<<<<<<HEAD
-    fragment.z=abs(fragment.z);
-    // fragment.xyz += vec3(fbm3(S * fragment.xyz)) / S;
-    // fragment.xy/=length(fragment.xyz)*.82;
-    
-    float radius=1.175;//7.85
-    
-    //radius = smoothstep(radius, radius - 1., length(fragment.xy));
-    // radius += 1.3 - (1 - sin(2. * audio));
-    radius+=.52*abs((audioRadius));
-    if(length(fragment.xyz)<radius){
-      
-      fragment.xyz=radius*max(.91,(smoothstep(3*radius,radius/2,length(fragment.xyz))))*normalize(fragment.xyz);
-      //fragment.xyz*=1.1;
-      //  fragment.xyz = radius * normalize(fragment.xyz);
-      //fragment.xy *= rot(PI / 2);
-      
-    }
-    else fragment.xyz=vec3(-2);
-    
-    fragment.xy=.5+fragment.xy/3.*vec2(screen.y/screen.x,1);
-    =======
-    fragment.xyz+=vec3(fbm3(fragment.xyzw,displaceX,vec4(flowX,flowY,flowZ,flowEvolution)),fbm3(fragment.yzxw,displaceY,vec4(flowY,flowZ,flowX,flowEvolution)),fbm3(fragment.zxyw,displaceZ,vec4(flowZ,flowX,flowY,flowEvolution)));
-    
-    // if(fragment.z>=0)fragment.z=min(1,fragment.z);
-    // else fragment.z=max(-1,fragment.z);
-    
-    fragment.z=abs(fragment.z);
-    
-    float radius=1.5;//1.175
-    radius+=.62*abs((audioRadius));
-    // if(length(fragment.xyz)<=radius){
-      //   // o.xyz=radius*(smoothstep(4.8*(radius),(radius)/4.,length(o.xyz)))*normalize(o.xyz);
-      fragment.xyz+=radius*(1-smoothstep(.0,radius+.18,length(fragment.xyz)))*normalize(fragment.xyz);
-      //   //seems to work a bit
-      //   //fragment.xyz=(radius+smoothstep(radius,radius/2.,length(fragment.xyz)))*normalize(fragment.xyz);
-      //   fragment.xyz=(radius/2+smoothstep(.0,.5,length(fragment.xyz)))/radius*normalize(fragment.xyz);
-      //  fragment.xyz=radius*max(.91,(smoothstep(3*radius,radius/2,length(fragment.xyz))))*normalize(fragment.xyz);
-      //   //fragment.xyz=(radius-(smoothstep(radius,.8,abs(radius-length(fragment.xyz)/7))))*normalize(fragment.xyz);
-      
-      //   //fragment.xyz*=1.1;
-      //   //  fragment.xyz = radius * normalize(fragment.xyz);
-      //   //fragment.xy *= rot(PI / 2);
-      
-    //  }
-    //else fragment.xyzw=vec4(-2);
-    
-    // fragment.w=cnoise(vec4(fragment.z),vec4(0));
-    fragment.xyzw=.5+fragment.xyzw/4.1*vec4(screen.y/screen.x,1,1,1);
-    >>>>>>>0e09aee(Added depth,fixed feathering of circle)
-    
-  //}else fragment=vec4(-2);
+  fragment.xyz+=vec3(fbm3(fragment.xyzw,displaceX,vec4(flowX,flowY,flowZ,flowEvolution)),fbm3(fragment.yzxw,displaceY,vec4(flowY,flowZ,flowX,flowEvolution)),fbm3(fragment.zxyw,displaceZ,vec4(flowZ,flowX,flowY,flowEvolution)));
+  
+  float radius=1.35;//1.175
+  radius+=.7*abs((audioRadius));
+  radius=min(radius,1.65);
+  vec3 deltaPos=vec3(radius*(1-smoothstep(-.01,radius+.1755,length(fragment.xyz)))*normalize(fragment.xyz));
+  fragment.xyz+=deltaPos;
+  fragment.w=.75*pow(length((radius)*normalize(fragment.xyz)-deltaPos),5);
+  
+  if(fragment.z<.5)
+  fragment.w+=3.5*pow(length((radius)*normalize(fragment.xyz)-fragment.xyz),.55);
+  
+  fragment.xyzw=.5+fragment.xyzw/3.81*vec4(screen.y/screen.x,1,1,1);
   
 }
