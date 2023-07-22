@@ -1,11 +1,6 @@
+The newer version which uses image2D texture to track positions is encouraged and located here: https://github.com/Roonil/NCS_Spectrum_GLava <br/>
 # NCS_Spectrum_GLava
-This is an attempt to replicate the well-known NCS Spectrum Audio Reactor, implemented for GLava. This is a fragment shader comprising of 8 (previously 7) buffers, and may prove to be a little GPU-intensive, but looks aesthetically pleasing anyways :) 
-
-
-
-https://user-images.githubusercontent.com/15421185/226474169-3f713d86-560f-42be-b81e-9bb32018ba09.mp4
-
-
+This is an attempt to replicate the well-known NCS Spectrum Audio Reactor, implemented for GLava. This is a fragment shader comprising of 9 buffers, and may prove to be a little GPU-intensive, but looks aesthetically pleasing anyways :) 
 
 # Installation Instructions
 1. Ensure that GLava is set-up and running properly, using **THIS** render.c as source file (changes .name = "screen" to .name = "time" at line 586) to ensure that time variable works properly:
@@ -14,7 +9,7 @@ https://user-images.githubusercontent.com/15421185/226474169-3f713d86-560f-42be-
 3. Run the module with ```glava -m ncs``` (Suggested resolution in rc.glsl: 370x370)
 
 # Screenshots
-![Screenshot](screenshots/SS1.png)
+![Screenshot](screenshots/SS3.png)
 # Shadertoy Link
 The shader was first made to work on shadertoy.com, which allows developing fragment shaders. Link to the shader here: https://www.shadertoy.com/view/dtfSDM
 
